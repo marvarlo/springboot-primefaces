@@ -6,11 +6,13 @@ import static jakarta.faces.application.StateManager.STATE_SAVING_METHOD_PARAM_N
 import static jakarta.faces.application.ViewHandler.FACELETS_SKIP_COMMENTS_PARAM_NAME;
 import static org.apache.myfaces.webapp.MyFacesContainerInitializer.FACES_SERVLET_ADDED_ATTRIBUTE;
 import static org.apache.myfaces.webapp.MyFacesContainerInitializer.FACES_SERVLET_FOUND;
-
+import org.apache.myfaces.spi.WebConfigProvider;
+import org.apache.myfaces.spi.impl.DefaultWebConfigProvider;
 import org.apache.myfaces.webapp.MyFacesContainerInitializer;
 import org.apache.myfaces.webapp.StartupServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,7 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.jsf.el.SpringBeanFacesELResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import com.mavlsoft.springbootjsf.utils.ViewScope;
 import jakarta.el.ELResolver;
 import jakarta.faces.application.ProjectStage;
 import jakarta.faces.webapp.FacesServlet;
@@ -53,8 +56,23 @@ public class AppConfig implements WebMvcConfigurer, ServletContextAware {
 
     @Bean
     ServletContainerInitializer getContainerInitializer() {
+        LOG.info("Configuring ServletContainerInitializer...");
         ServletContainerInitializer initializer = new MyFacesContainerInitializer();
         return initializer;
+    }
+    @Bean
+    static CustomScopeConfigurer getViewScope() {
+        LOG.info("Configuring Custom View Scope...");
+        CustomScopeConfigurer viewScope = new CustomScopeConfigurer();
+        viewScope.addScope(ViewScope.VIEW, new ViewScope());
+        return viewScope;
+    }
+
+    @Bean
+    WebConfigProvider webConfig() {
+        LOG.info("Creating WebConfigProvider...");
+        WebConfigProvider provider = new DefaultWebConfigProvider();
+        return provider;
     }
 
     @Override

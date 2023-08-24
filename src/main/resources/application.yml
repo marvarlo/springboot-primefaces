@@ -1,0 +1,28 @@
+logging:
+  file:
+    name: springjsf.log
+    path: /logs
+  level:
+    org:
+      hibernate:
+        SQL: debug
+      springframework: INFO
+server:
+  port: 8080
+  servlet:
+    context-path: /springjsf
+spring:
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+  h2:
+    console:
+      enabled: true
+  jpa:
+    defer-datasource-initialization: true
+    spring:
+      jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+  sql:
+    init:      
+      data-locations: classpath*:data-h2.sql
