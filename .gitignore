@@ -36,3 +36,6 @@ build/
 *.log
 *.bak
 *.old
+*.gz
+*.zip
+*.7zip
