@@ -10,7 +10,7 @@ In this release we used:
 |[SpringBoot]| 3.1.2|
 |[Java JDK]| 17 *|
 
-> * Note: I like to use Amazon Coretto JDk, but you can you any JDK distribution. Also works on Java 11 BUT not on java 8. 
+> * Note: I like to use Amazon Coretto JDk, but you can you any JDK distribution. 
   
 This will create a runnable/deployable war file
 

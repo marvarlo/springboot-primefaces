@@ -1,151 +1,165 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:p="http://primefaces.org/ui">
-	<!-- f:view transient="true" -->
-	<h:head>
-		<style>
-			p { line-height: 1.5;
-			    margin: 0;
-			    text-align: justify;
-			 }
-			.brands .brands-table-header {
-			 display: -ms-flexbox;
-			 display: flex;
-			 -ms-flex-align: center;
-			 align-items: center;
-			 -ms-flex-pack: justify;
-			 justify-content: space-between;
-			 -ms-flex-wrap: wrap;
-			 flex-wrap: wrap;
-			 }
-		</style>
-	</h:head>
-	<body>
-		<div class="card brands">
-		<h:form id="#{brandsBean.formName}">
-			<p:growl id="messages" showDetail="true" />
-			<p:toolbar>
-				<p:toolbarGroup>
-					<p:commandButton value="New" icon="pi pi-plus"
-						actionListener="#{brandsBean.newBrand}"
-						update=":dialogs:manage-dialog-content"
-						oncomplete="PF('manageDialog').show()"
-						styleClass="ui-button-success" style="margin-right: .5rem">
-                    <p:resetInput target=":dialogs:manage-dialog-content" />
-					</p:commandButton>
-					<p:commandButton id="#{brandsBean.deleteButton}"
-						value="#{brandsBean.deleteButtonMessage}"
-						icon="pi pi-trash"
-						actionListener="#{brandsBean.deleteSelectedBrands}"
-						styleClass="ui-button-danger"
-						disabled="#{!brandsBean.hasSelectedBrands()}"
-						update="@this">
-						<p:confirm header="Confirmation" message="Delete the selected brands?" icon="pi pi-exclamation-triangle" />
-					</p:commandButton>
-				</p:toolbarGroup>
-				<p:toolbarGroup align="right">
-					<p:fileUpload mode="simple" skinSimple="true" label="Import" chooseIcon="pi pi-download" />
-					<p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
-						<p:dataExporter type="pdf" target="#{brandsBean.dataTableName}" fileName="brands" />
-					</p:commandButton>
-				</p:toolbarGroup>
-			</p:toolbar>
-			
-			<p:dataTable id="#{brandsBean.dataTableName}" widgetVar="#{brandsBean.dataTableWidget}" var="brand" value="#{brandsBean.brandList}"
-	            reflow="true" styleClass="brands-table" selection="#{brandsBean.selectedBrands}"
-	            rowKey="#{brand.brandId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
-	            <f:facet name="header">
-	                <div class="brands-table-header">
-	                    <span style="font-weight: bold">Brands</span>
-	                    <span class="filter-container ui-input-icon-left">
-	                    	<i class="pi pi-search"></i>
-	                        <p:inputText id="globalFilter" onkeyup="PF('#{brandsBean.dataTableWidget}').filter()" placeholder="Search" />
-	                    </span>
-	                </div>
-	            </f:facet>
+   xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+   xmlns:f="http://xmlns.jcp.org/jsf/core"
+   xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui">
+<!-- f:view transient="true" -->
+<h:head>
+   <style>
+      p {
+       line-height: 1.5;
+       margin: 0;
+       text-align: justify;
+      }
+      .brands .brands-table-header {
+       display: -ms-flexbox;
+       display: flex;
+       -ms-flex-align: center;
+       align-items: center;
+       -ms-flex-pack: justify;
+       justify-content: space-between;
+       -ms-flex-wrap: wrap;
+       flex-wrap: wrap;
+      }
+</style>
+</h:head>
 
-	            <p:ajax event="rowSelect" update="#{brandsBean.formDeleteButton}" />
-	            <p:ajax event="rowUnselect" update="#{brandsBean.formDeleteButton}" />
-	            <p:ajax event="rowSelectCheckbox" update="#{brandsBean.formDeleteButton}" />
-	            <p:ajax event="rowUnselectCheckbox" update="#{brandsBean.formDeleteButton}" />
-	            <p:ajax event="toggleSelect" update="#{brandsBean.formDeleteButton}" />
-	
-	            <p:column selectionMode="multiple" exportable="false"></p:column>	
-	            <p:column headerText="Code" sortBy="#{brand.code}" filterBy="#{brand.brandId}">
-	                <h:outputText value="#{brand.brandId}" />
-	            </p:column>
-	            <p:column headerText="Name" sortBy="#{brand.brand}" filterBy="#{brand.brand}">
-	                <h:outputText value="#{brand.brand}" />
-	            </p:column>
-	            <p:column headerText="is active">
-	                <h:outputText value="#{brand.active}"/>
-	            </p:column>
-	            <p:column exportable="false">
-	                <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-dialog-content"
-	                    oncomplete="PF('manageDialog').show()"
-	                    styleClass="edit-button rounded-button ui-button-success" process="@this">
-	                    <f:setPropertyActionListener value="#{brand}" target="#{brandsBean.currBrand}" />
-	                    <p:resetInput target=":dialogs:manage-dialog-content" />
-	                </p:commandButton>
-	                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
-	                	process="@this"
-	                	oncomplete="PF('deleteDialog').show()">
-	                    <f:setPropertyActionListener value="#{brand}" target="#{brandsBean.currBrand}" />
-	                </p:commandButton>
-	            </p:column>
-	        </p:dataTable>
-		</h:form>
-		
-		<h:form id="dialogs">
-	        <p:dialog header="Brand Details" showEffect="fade" modal="true" widgetVar="manageDialog" responsive="true">
-	            <p:outputPanel id="manage-dialog-content" class="ui-fluid">
-	                <p:outputPanel rendered="#{not empty brandsBean.currBrand}">
-	                    <div class="field">
-	                        <p:outputLabel for="name">Name</p:outputLabel>
-	                        <p:inputText id="name" value="#{brandsBean.currBrand.brand}" required="true" />
-	                    </div>
-	                    <div class="field">
-	                        <p:outputLabel for="active">Is active?</p:outputLabel>
-	                        <p:selectBooleanButton id="active" value="#{brandsBean.currBrand.active}"
-	                        	onLabel="Yes" offLabel="No"
-	                        	onIcon="pi pi-check" offIcon="pi pi-times"/>
-	                    </div>	                   
-	                </p:outputPanel>
-	            </p:outputPanel>	
-	            <f:facet name="footer">
-	                <p:commandButton value="Save" 
-	                	icon="pi pi-check"
-	                	actionListener="#{brandsBean.save}"
-	                	update="manage-dialog-content"
-	                	process="manage-dialog-content @this" />
-	                <p:commandButton value="Cancel"
-	                	icon="pi pi-times"
-	                	onclick="PF('manageDialog').hide()"
-	                	class="ui-button-secondary"
-	                	type="button" />
-	            </f:facet>
-	        </p:dialog>
-	
-	        <p:confirmDialog widgetVar="deleteDialog" showEffect="fade" width="300"
-	            message="Delete the brand '#{brandsBean.currBrand.brand}'?" header="Confirm" severity="warn">
-	            <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{brandsBean.delete}"
-	                process="@this" update="#{brandsBean.formDeleteButton}"
-	                oncomplete="PF('deleteDialog').hide()" />
-	            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
-	                onclick="PF('deleteDialog').hide()" />
-	        </p:confirmDialog>
-	
-	        <p:confirmDialog global="true" showEffect="fade" width="300">
-	            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-	            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
-	                icon="pi pi-times" />
-	        </p:confirmDialog>
-	    </h:form>
-	    </div>
-	</body>
-	<!-- /f:view -->
+<body>
+   <div class="card brands">
+      <h:form id="#{brandsBean.formName}">
+         <p:growl id="#{brandsBean.growlId}" showDetail="true" />
+         <p:toolbar>
+            <p:toolbarGroup>
+               <p:commandButton value="New" icon="pi pi-plus"
+                  actionListener="#{brandsBean.newItem}"
+                  update=":dialogs:manage-dialog-content"
+                  oncomplete="PF('manageDialog').show()"
+                  styleClass="ui-button-success" style="margin-right: .5rem">
+                  <p:resetInput target=":dialogs:manage-dialog-content" />
+               </p:commandButton>
+               <p:commandButton id="#{brandsBean.deleteButton}"
+                  value="#{brandsBean.deleteButtonMessage}" icon="pi pi-trash"
+                  actionListener="#{brandsBean.deleteSelectedItems}"
+                  styleClass="ui-button-danger"
+                  disabled="#{!brandsBean.hasSelectedItems()}" update="@this">
+                  <p:confirm header="Confirmation"
+                     message="Delete the selected brands?"
+                     icon="pi pi-exclamation-triangle" />
+               </p:commandButton>
+            </p:toolbarGroup>
+            <p:toolbarGroup align="right">
+               <p:fileUpload mode="simple" skinSimple="true" label="Import"
+                  chooseIcon="pi pi-download" />
+               <p:commandButton value="Export" icon="pi pi-upload"
+                  styleClass="ui-button-help" ajax="false">
+                  <p:dataExporter type="pdf"
+                     target="#{brandsBean.dataTableName}" fileName="brands" />
+               </p:commandButton>
+            </p:toolbarGroup>
+         </p:toolbar>
+
+         <p:dataTable id="#{brandsBean.dataTableName}"
+            widgetVar="#{brandsBean.dataTableWidget}" var="brand"
+            value="#{brandsBean.brandList}" reflow="true"
+            styleClass="brands-table" selection="#{brandsBean.selectedBrands}"
+            rowKey="#{brand.brandId}" paginator="true" rows="10"
+            rowSelectMode="add" paginatorPosition="bottom">
+            <f:facet name="header">
+               <div class="brands-table-header">
+                  <span style="font-weight: bold">Brands</span>
+                  <span class="filter-container ui-input-icon-left"> 
+                     <i class="pi pi-search"></i>
+                     <p:inputText id="globalFilter"
+                        onkeyup="PF('#{brandsBean.dataTableWidget}').filter()"
+                        placeholder="Search" />
+                  </span>
+               </div>
+            </f:facet>
+
+            <p:ajax event="rowSelect" update="#{brandsBean.formDeleteButton}" />
+            <p:ajax event="rowUnselect" update="#{brandsBean.formDeleteButton}" />
+            <p:ajax event="rowSelectCheckbox" update="#{brandsBean.formDeleteButton}" />
+            <p:ajax event="rowUnselectCheckbox" update="#{brandsBean.formDeleteButton}" />
+            <p:ajax event="toggleSelect" update="#{brandsBean.formDeleteButton}" />
+
+            <p:column selectionMode="multiple" exportable="false"></p:column>
+            <p:column headerText="Id" sortBy="#{brand.brandId}" filterBy="#{brand.brandId}">
+               <h:outputText value="#{brand.brandId}" />
+            </p:column>
+            <p:column headerText="Name" sortBy="#{brand.brand}" filterBy="#{brand.brand}">
+               <h:outputText value="#{brand.brand}" />
+            </p:column>
+            <p:column headerText="is active?">
+               <h:outputText value="#{brand.active}" />
+            </p:column>
+            <p:column exportable="false">
+               <p:commandButton icon="pi pi-pencil"
+                  update=":dialogs:manage-dialog-content"
+                  oncomplete="PF('manageDialog').show()"
+                  styleClass="edit-button rounded-button ui-button-success"
+                  process="@this">
+                  <f:setPropertyActionListener value="#{brand}" target="#{brandsBean.currBrand}" />
+                  <p:resetInput target=":dialogs:manage-dialog-content" />
+               </p:commandButton>
+               <p:commandButton class="ui-button-warning rounded-button"
+                  icon="pi pi-trash" process="@this"
+                  oncomplete="PF('deleteDialog').show()">
+                  <f:setPropertyActionListener value="#{brand}" target="#{brandsBean.currBrand}" />
+               </p:commandButton>
+            </p:column>
+         </p:dataTable>
+      </h:form>
+
+      <h:form id="dialogs">
+         <p:dialog header="Brand Details" showEffect="fade" modal="true"
+            widgetVar="manageDialog" responsive="true">
+            <p:outputPanel id="manage-dialog-content" class="ui-fluid">
+               <p:outputPanel rendered="#{not empty brandsBean.currBrand}">
+                  <div class="field">
+                     <p:outputLabel for="name">Name</p:outputLabel>
+                     <p:inputText id="name" value="#{brandsBean.currBrand.brand}" required="true" />
+                  </div>
+                  <div class="field">
+                     <p:outputLabel for="active">Is active?</p:outputLabel>
+                     <p:selectBooleanButton id="active"
+                        value="#{brandsBean.currBrand.active}" onLabel="Yes"
+                        offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" />
+                  </div>
+               </p:outputPanel>
+            </p:outputPanel>
+            <f:facet name="footer">
+               <p:commandButton value="Save" icon="pi pi-check"
+                  actionListener="#{brandsBean.save}"
+                  update="manage-dialog-content"
+                  process="manage-dialog-content @this" />
+               <p:commandButton value="Cancel" icon="pi pi-times"
+                  onclick="PF('manageDialog').hide()"
+                  class="ui-button-secondary" type="button" />
+            </f:facet>
+         </p:dialog>
+
+         <p:confirmDialog widgetVar="deleteDialog" showEffect="fade" width="300"
+            message="Delete the brand '#{brandsBean.currBrand.brand}'?"
+            header="Confirm" severity="warn">
+            <p:commandButton value="Yes" icon="pi pi-check"
+               actionListener="#{brandsBean.delete}" process="@this"
+               update="#{brandsBean.formDeleteButton}"
+               oncomplete="PF('deleteDialog').hide()" />
+            <p:commandButton value="No" type="button"
+               styleClass="ui-button-secondary" icon="pi pi-times"
+               onclick="PF('deleteDialog').hide()" />
+         </p:confirmDialog>
+
+         <p:confirmDialog global="true" showEffect="fade" width="300">
+            <p:commandButton value="Yes" type="button"
+               styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+            <p:commandButton value="No" type="button"
+               styleClass="ui-confirmdialog-no ui-button-secondary"
+               icon="pi pi-times" />
+         </p:confirmDialog>
+      </h:form>
+   </div>
+</body>
+<!-- /f:view -->
 </html>
